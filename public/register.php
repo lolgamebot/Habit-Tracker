@@ -62,6 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body class="auth-body">
     <div class="auth-card">
+        <a href="login.php" class="brand" style="margin-bottom:1.25rem; display:inline-flex;"><span class="brand-dot" aria-hidden="true"></span>Habit&nbsp;Tracker</a>
         <h1>Create your account</h1>
         <p class="muted">Start tracking habits in under a minute.</p>
 

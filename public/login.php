@@ -47,6 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body class="auth-body">
     <div class="auth-card">
+        <a href="login.php" class="brand" style="margin-bottom:1.25rem; display:inline-flex;"><span class="brand-dot" aria-hidden="true"></span>Habit&nbsp;Tracker</a>
         <h1>Welcome back</h1>
         <p class="muted">Log in to keep your streak going.</p>
 

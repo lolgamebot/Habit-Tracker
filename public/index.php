@@ -77,6 +77,7 @@ $weekdayLetters = ['Sun' => 'S', 'Mon' => 'M', 'Tue' => 'T', 'Wed' => 'W', 'Thu'
             $stats = $grid['rowStats'][$habit['id']]; ?>
             <tr data-habit-id="<?= $habit['id'] ?>">
                 <td class="col-habit">
+                    <div class="habit-cell-inner">
                     <span class="habit-name"><?= e($habit['name']) ?></span>
                     <form action="delete-habit.php" method="post" class="inline-form">
                         <?php renderCsrfInput(); ?>
@@ -84,6 +85,7 @@ $weekdayLetters = ['Sun' => 'S', 'Mon' => 'M', 'Tue' => 'T', 'Wed' => 'W', 'Thu'
                         <input type="hidden" name="redirect_month" value="<?= e($month) ?>">
                         <button type="submit" class="link-button danger" onclick="return confirm('Delete this habit and all its history?')">&times;</button>
                     </form>
+                    </div>
                 </td>
                 <?php for ($d = 1; $d <= $grid['daysInMonth']; $d++):
                     $checked = !empty($grid['logs'][$habit['id']][$d]);
@@ -139,7 +141,7 @@ $weekdayLetters = ['Sun' => 'S', 'Mon' => 'M', 'Tue' => 'T', 'Wed' => 'W', 'Thu'
         totalHabits: <?= json_encode(count($grid['habits'])) ?>
     };
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="chart.min.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

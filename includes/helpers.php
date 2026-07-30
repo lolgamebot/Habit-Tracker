@@ -63,7 +63,7 @@ function requireLogin() {
 function renderNav($username) {
     echo '
     <nav class="topbar">
-        <a href="index.php" class="brand">Habit&nbsp;Tracker</a>
+        <a href="index.php" class="brand"><span class="brand-dot" aria-hidden="true"></span>Habit&nbsp;Tracker</a>
         <div class="topbar-nav">
             <span class="topbar-user">' . e($username) . '</span>
             <a href="logout.php" class="link-button">Log out</a>

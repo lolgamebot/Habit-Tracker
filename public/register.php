@@ -36,9 +36,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $insert->execute([$username, $hash]);
             $userId = $pdo->lastInsertId();
 
-            // Seed starter habits so the dashboard isn't empty on first login
+            // Seed a few starter habit slots so the dashboard isn't empty on first login
             $seed = $pdo->prepare("INSERT INTO habits (user_id, name, sort_order) VALUES (?, ?, ?)");
-            foreach (["Wake up early", "Walk", "Workout", "Remove Distraction", "Calorie Budget"] as $i => $name) {
+            foreach (["Habit 1", "Habit 2", "Habit 3"] as $i => $name) {
                 $seed->execute([$userId, $name, $i]);
             }
 

@@ -1,0 +1,94 @@
+* { box-sizing: border-box; }
+
+.recap-body {
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  background: #000;
+}
+
+.recap-slide {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  color: #fff;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease;
+}
+.recap-slide.active { opacity: 1; pointer-events: auto; }
+
+.recap-content { max-width: 520px; }
+
+.recap-eyebrow { text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.85rem; font-weight: 600; opacity: 0.85; margin: 0 0 0.5rem; }
+.recap-huge { font-size: 4.25rem; font-weight: 800; margin: 0; line-height: 1.05; letter-spacing: -0.02em; }
+.recap-huge-text { font-size: 2.5rem; }
+.recap-number { font-size: 5.5rem; font-weight: 800; margin: 0.25rem 0; line-height: 1; font-variant-numeric: tabular-nums; }
+.recap-label { font-size: 1.05rem; opacity: 0.92; margin-top: 0.6rem; line-height: 1.5; }
+
+.recap-btn {
+  display: inline-block;
+  margin-top: 1.75rem;
+  padding: 0.7rem 1.5rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #262220;
+  font-weight: 700;
+  text-decoration: none;
+}
+.recap-btn:hover { background: #fff; }
+
+.recap-slide-1 { background: linear-gradient(160deg, #3d1f4d, #1a0e26); }
+.recap-slide-2 { background: linear-gradient(160deg, #a35a52, #5e2e28); }
+.recap-slide-3 { background: linear-gradient(160deg, #d99a3d, #8f5417); }
+.recap-slide-4 { background: linear-gradient(160deg, #2e7d8f, #123844); }
+.recap-slide-5 { background: linear-gradient(160deg, #b23b5e, #5c1930); }
+.recap-slide-6 { background: linear-gradient(160deg, #3f8f5e, #1a3f29); }
+.recap-slide-7 { background: linear-gradient(160deg, #2c4a8c, #101d3b); }
+.recap-slide-8 { background: linear-gradient(160deg, #c17b73, #3d1f4d); }
+.recap-slide-empty { background: linear-gradient(160deg, #4a4a4a, #1c1c1c); }
+
+.recap-exit {
+  position: fixed; top: 1rem; right: 1.25rem; z-index: 50;
+  color: #fff; font-size: 1.9rem; line-height: 1; text-decoration: none; opacity: 0.75;
+}
+.recap-exit:hover { opacity: 1; }
+
+.recap-year-picker { position: fixed; top: 1rem; left: 1.25rem; z-index: 50; }
+.recap-year-picker select {
+  background: rgba(255, 255, 255, 0.15); color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 6px;
+  padding: 0.4rem 0.6rem; font: inherit; cursor: pointer;
+}
+.recap-year-picker option { color: #262220; }
+
+.recap-progress {
+  position: fixed; top: 0; left: 0; right: 0;
+  display: flex; gap: 4px; padding: 0.85rem 1rem 0; z-index: 50;
+}
+.recap-progress-seg { flex: 1; height: 3px; background: rgba(255, 255, 255, 0.28); border-radius: 2px; overflow: hidden; }
+.recap-progress-seg span { display: block; height: 100%; width: 0; background: #fff; }
+.recap-progress-seg.done span { width: 100%; }
+.recap-progress-seg.current span { width: 100%; transition: width 0.4s ease; }
+
+.recap-nav {
+  position: fixed; top: 50%; transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.15); border: none; color: #fff;
+  width: 2.75rem; height: 2.75rem; border-radius: 50%;
+  font-size: 1.2rem; cursor: pointer; z-index: 50;
+}
+.recap-nav:hover { background: rgba(255, 255, 255, 0.3); }
+.recap-prev { left: 1rem; }
+.recap-next { right: 1rem; }
+
+@media (max-width: 600px) {
+  .recap-huge { font-size: 3rem; }
+  .recap-huge-text { font-size: 2rem; }
+  .recap-number { font-size: 4rem; }
+  .recap-nav { width: 2.4rem; height: 2.4rem; }
+}

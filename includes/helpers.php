@@ -65,6 +65,7 @@ function renderNav($username) {
     <nav class="topbar">
         <a href="index.php" class="brand"><span class="brand-dot" aria-hidden="true"></span>Habit&nbsp;Tracker</a>
         <div class="topbar-nav">
+            <a href="recap.php" class="link-button">Year Recap</a>
             <span class="topbar-user">' . e($username) . '</span>
             <a href="logout.php" class="link-button">Log out</a>
         </div>
@@ -138,6 +139,121 @@ function habitBelongsToUser($pdo, $habitId, $userId) {
     $stmt = $pdo->prepare("SELECT 1 FROM habits WHERE id = ? AND user_id = ?");
     $stmt->execute([$habitId, $userId]);
     return (bool) $stmt->fetchColumn();
+}
+
+// ---- Year recap logic ----
+
+function getAvailableYears($pdo, $userId) {
+    $stmt = $pdo->prepare("
+        SELECT DISTINCT YEAR(hl.log_date) AS yr
+        FROM habit_logs hl
+        JOIN habits h ON h.id = hl.habit_id
+        WHERE h.user_id = ?
+        ORDER BY yr DESC
+    ");
+    $stmt->execute([$userId]);
+    return array_map('intval', array_column($stmt->fetchAll(), 'yr'));
+}
+
+function getYearRecap($pdo, $userId, $year) {
+    $yearStart = "$year-01-01";
+    $yearEnd = "$year-12-31";
+
+    $today = new DateTime();
+    $isCurrentYear = ((int) $year === (int) $today->format('Y'));
+    $daysElapsed = $isCurrentYear
+        ? (int) $today->format('z') + 1
+        : (int) (new DateTime("$year-12-31"))->format('z') + 1;
+
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM habits WHERE user_id = ?");
+    $stmt->execute([$userId]);
+    $totalHabits = (int) $stmt->fetchColumn();
+
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*) FROM habit_logs hl
+        JOIN habits h ON h.id = hl.habit_id
+        WHERE h.user_id = ? AND hl.completed = 1 AND hl.log_date BETWEEN ? AND ?
+    ");
+    $stmt->execute([$userId, $yearStart, $yearEnd]);
+    $totalCheckins = (int) $stmt->fetchColumn();
+
+    $stmt = $pdo->prepare("
+        SELECT h.name, COUNT(*) AS cnt
+        FROM habit_logs hl
+        JOIN habits h ON h.id = hl.habit_id
+        WHERE h.user_id = ? AND hl.completed = 1 AND hl.log_date BETWEEN ? AND ?
+        GROUP BY h.id, h.name
+        ORDER BY cnt DESC
+        LIMIT 1
+    ");
+    $stmt->execute([$userId, $yearStart, $yearEnd]);
+    $bestHabit = $stmt->fetch();
+
+    $stmt = $pdo->prepare("
+        SELECT MONTH(hl.log_date) AS mo, COUNT(*) AS cnt
+        FROM habit_logs hl
+        JOIN habits h ON h.id = hl.habit_id
+        WHERE h.user_id = ? AND hl.completed = 1 AND hl.log_date BETWEEN ? AND ?
+        GROUP BY mo
+        ORDER BY cnt DESC
+        LIMIT 1
+    ");
+    $stmt->execute([$userId, $yearStart, $yearEnd]);
+    $busiestMonth = $stmt->fetch();
+
+    // One row per day that had ANY logged activity, with how many were completed that day.
+    $stmt = $pdo->prepare("
+        SELECT hl.log_date AS d, SUM(hl.completed) AS checkedCount
+        FROM habit_logs hl
+        JOIN habits h ON h.id = hl.habit_id
+        WHERE h.user_id = ? AND hl.log_date BETWEEN ? AND ?
+        GROUP BY hl.log_date
+        ORDER BY hl.log_date ASC
+    ");
+    $stmt->execute([$userId, $yearStart, $yearEnd]);
+    $dayRows = $stmt->fetchAll();
+
+    $activeDates = [];
+    $perfectDays = 0;
+    foreach ($dayRows as $row) {
+        if ((int) $row['checkedCount'] > 0) {
+            $activeDates[] = $row['d'];
+        }
+        if ($totalHabits > 0 && (int) $row['checkedCount'] === $totalHabits) {
+            $perfectDays++;
+        }
+    }
+
+    // Longest run of consecutive days with at least one habit checked off.
+    $longestStreak = 0;
+    $currentStreak = 0;
+    $prevDate = null;
+    foreach ($activeDates as $dateStr) {
+        $date = new DateTime($dateStr);
+        $currentStreak = ($prevDate !== null && (int) $prevDate->diff($date)->days === 1)
+            ? $currentStreak + 1
+            : 1;
+        $longestStreak = max($longestStreak, $currentStreak);
+        $prevDate = $date;
+    }
+
+    $completionRate = ($totalHabits > 0 && $daysElapsed > 0)
+        ? round($totalCheckins / ($totalHabits * $daysElapsed) * 100, 1)
+        : 0.0;
+
+    return [
+        'year'             => (int) $year,
+        'totalCheckins'    => $totalCheckins,
+        'totalHabits'      => $totalHabits,
+        'bestHabit'        => $bestHabit['name'] ?? null,
+        'bestHabitCount'   => $bestHabit ? (int) $bestHabit['cnt'] : 0,
+        'busiestMonth'     => $busiestMonth ? date('F', mktime(0, 0, 0, (int) $busiestMonth['mo'], 1)) : null,
+        'busiestMonthCount'=> $busiestMonth ? (int) $busiestMonth['cnt'] : 0,
+        'longestStreak'    => $longestStreak,
+        'perfectDays'      => $perfectDays,
+        'completionRate'   => $completionRate,
+        'activeDays'       => count($activeDates),
+    ];
 }
 
 function toggleHabitLog($pdo, $habitId, $date) {

@@ -1,8 +1,6 @@
 <?php
-require "../config/db.php";
-require "../includes/helpers.php";
+require "../includes/bootstrap.php";
 
-initSecureSession();
 header('Content-Type: application/json');
 
 if (!isset($_SESSION["user_id"])) {

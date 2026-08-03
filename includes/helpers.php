@@ -1,8 +1,11 @@
 <?php
-// Security headers
-header("X-Frame-Options: SAMEORIGIN");
-header("X-Content-Type-Options: nosniff");
-header("X-XSS-Protection: 1; mode=block");
+/**
+ * Shared helper functions for Habit Tracker.
+ *
+ * NOTE: Security headers + the hardened session init are handled by
+ * bootstrap.php. Pages should require bootstrap.php (which loads this file),
+ * not this file directly.
+ */
 
 function initSecureSession() {
     if (session_status() === PHP_SESSION_NONE) {
@@ -27,12 +30,8 @@ function getCsrfToken() {
     return $_SESSION['csrf_token'];
 }
 
-function csrfField() {
-    return '<input type="hidden" name="csrf_token" value="' . e(getCsrfToken()) . '">';
-}
-
 function renderCsrfInput() {
-    echo csrfField();
+    echo '<input type="hidden" name="csrf_token" value="' . e(getCsrfToken()) . '">';
 }
 
 function verifyCsrfToken() {
@@ -64,6 +63,29 @@ function requireLogin() {
     }
 }
 
+// Redirect to a page with a flash message attached (used by the action endpoints).
+function redirectWithFlash($location, $message, $isSuccess = true) {
+    $type = $isSuccess ? 'success' : 'error';
+    header("Location: " . $location . "?flash=" . urlencode($message) . "&flash_type=" . $type);
+    exit;
+}
+
+// Loads the current user's theme/avatar/dark-mode settings into the session
+// (idempotent), so pages can render the right theme without repeated queries.
+function loadUserSession($pdo, $userId) {
+    $stmt = $pdo->prepare("SELECT avatar, theme, custom_color, custom_text_color, dark_mode FROM accounts WHERE id = ?");
+    $stmt->execute([$userId]);
+    $row = $stmt->fetch();
+    if (!$row) {
+        return;
+    }
+    $_SESSION['avatar'] = $row['avatar'];
+    $_SESSION['theme'] = $row['theme'] ?? 'rose';
+    $_SESSION['custom_color'] = $row['custom_color'] ?? null;
+    $_SESSION['custom_text_color'] = $row['custom_text_color'] ?? null;
+    $_SESSION['dark_mode'] = (bool)($row['dark_mode'] ?? false);
+}
+
 function renderNav($username, $pendingRequests = 0, $avatar = null, $darkMode = null) {
     initSecureSession();
     if ($darkMode === null) {
@@ -78,7 +100,7 @@ function renderNav($username, $pendingRequests = 0, $avatar = null, $darkMode = 
         <div class="topbar-nav">
             <a href="recap.php" class="link-button">Year Recap</a>
             <form action="toggle-dark-mode.php" method="post" class="inline-form" id="dark-mode-form">
-                ' . csrfField() . '
+                ' . renderCsrfInput() . '
                 <input type="hidden" name="redirect" value="' . $currentPath . '">
                 <label class="dark-toggle" title="Toggle dark mode">
                     <input type="checkbox" id="dark-mode-checkbox" name="dark_mode" ' . $checked . '>
@@ -509,30 +531,6 @@ function getTheme($themeId, $customColor = null) {
     return $themes[$themeId] ?? $themes['rose'];
 }
 
-function getActiveUserSettings($pdo = null, $userId = null) {
-    initSecureSession();
-    if ($userId === null && isset($_SESSION['user_id'])) {
-        $userId = $_SESSION['user_id'];
-    }
-    if ($userId && $pdo && (!isset($_SESSION['dark_mode']) || !isset($_SESSION['theme']) || !array_key_exists('custom_color', $_SESSION) || !array_key_exists('custom_text_color', $_SESSION))) {
-        $stmt = $pdo->prepare("SELECT theme, custom_color, custom_text_color, dark_mode FROM accounts WHERE id = ?");
-        $stmt->execute([$userId]);
-        $row = $stmt->fetch();
-        if ($row) {
-            $_SESSION['theme'] = $row['theme'] ?? 'rose';
-            $_SESSION['custom_color'] = $row['custom_color'];
-            $_SESSION['custom_text_color'] = $row['custom_text_color'];
-            $_SESSION['dark_mode'] = (bool)($row['dark_mode'] ?? false);
-        }
-    }
-    return [
-        'theme' => $_SESSION['theme'] ?? 'rose',
-        'custom_color' => $_SESSION['custom_color'] ?? null,
-        'custom_text_color' => $_SESSION['custom_text_color'] ?? null,
-        'dark_mode' => !empty($_SESSION['dark_mode']),
-    ];
-}
-
 // Outputs a tiny inline <style> overriding the CSS variables for this user's
 // theme (and, if enabled, dark mode's neutral palette) - computed server-side
 // so the page is never briefly the wrong color.
@@ -650,15 +648,17 @@ function getYearRecap($pdo, $userId, $year) {
         GROUP BY h.id, h.name
     ");
     $stmt->execute([$userId, $yearStart, $yearEnd]);
-    $habitCounts = $stmt->fetchAll();
+$habitCounts = $stmt->fetchAll();
 
     $bestHabitName = null;
     $bestHabitPercent = 0.0;
+    $bestHabitCount = 0;
     foreach ($habitCounts as $row) {
         $pct = $daysElapsed > 0 ? ($row['cnt'] / $daysElapsed) * 100 : 0;
         if ($pct > $bestHabitPercent) {
             $bestHabitPercent = $pct;
             $bestHabitName = $row['name'];
+            $bestHabitCount = (int) $row['cnt'];
         }
     }
     $bestHabitPercent = round(min($bestHabitPercent, 100), 1);
@@ -676,8 +676,9 @@ function getYearRecap($pdo, $userId, $year) {
     $stmt->execute([$userId, $yearStart, $yearEnd]);
     $monthCounts = $stmt->fetchAll();
 
-    $busiestMonthName = null;
+$busiestMonthName = null;
     $busiestMonthPercent = 0.0;
+    $busiestMonthCount = 0;
     $currentMonthNum = (int) $today->format('n');
     foreach ($monthCounts as $row) {
         $mo = (int) $row['mo'];
@@ -693,6 +694,7 @@ function getYearRecap($pdo, $userId, $year) {
         if ($pct > $busiestMonthPercent) {
             $busiestMonthPercent = $pct;
             $busiestMonthName = date('F', mktime(0, 0, 0, $mo, 1));
+            $busiestMonthCount = (int) $row['cnt'];
         }
     }
     $busiestMonthPercent = round(min($busiestMonthPercent, 100), 1);
@@ -737,14 +739,16 @@ function getYearRecap($pdo, $userId, $year) {
         ? round($totalCheckins / ($totalHabits * $daysElapsed) * 100, 1)
         : 0.0;
 
-    return [
+return [
         'year'                => (int) $year,
         'totalCheckins'       => $totalCheckins,
         'totalHabits'         => $totalHabits,
         'bestHabit'           => $bestHabitName,
         'bestHabitPercent'    => $bestHabitPercent,
+        'bestHabitCount'      => $bestHabitCount,
         'busiestMonth'        => $busiestMonthName,
         'busiestMonthPercent' => $busiestMonthPercent,
+        'busiestMonthCount'   => $busiestMonthCount,
         'longestStreak'       => $longestStreak,
         'perfectDays'         => $perfectDays,
         'completionRate'      => $completionRate,

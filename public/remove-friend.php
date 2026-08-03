@@ -1,6 +1,5 @@
 <?php
-require "../config/db.php";
-require "../includes/helpers.php";
+require "../includes/bootstrap.php";
 
 requireLogin();
 
@@ -14,8 +13,8 @@ verifyCsrfToken();
 $userId = $_SESSION["user_id"];
 $friendshipId = (int) ($_POST["friendship_id"] ?? 0);
 
-$ok = removeFriendship($pdo, $friendshipId, $userId);
-$msg = $ok ? "Done." : "Could not complete that action.";
+if ($friendshipId && removeFriendship($pdo, $friendshipId, $userId)) {
+    redirectWithFlash('profile.php', "Done.");
+}
 
-header("Location: profile.php?flash=" . urlencode($msg) . "&flash_type=" . ($ok ? "success" : "error"));
-exit;
+redirectWithFlash('profile.php', "Could not complete that action.", false);

@@ -1,6 +1,5 @@
 <?php
-require "../config/db.php";
-require "../includes/helpers.php";
+require "../includes/bootstrap.php";
 
 requireLogin();
 

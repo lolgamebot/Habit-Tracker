@@ -4,6 +4,11 @@
 
   let current = 0;
   const progressBar = document.getElementById('recap-progress');
+  const AUTO_ADVANCE_MS = 4000;
+
+  let autoTimer = null;
+  let hover = false;
+  let paused = false;
 
   if (progressBar) {
     slides.forEach(() => {
@@ -58,14 +63,43 @@
     if (current > 0) showSlide(current - 1);
   }
 
+  function clearAutoTimer() {
+    if (autoTimer) {
+      clearTimeout(autoTimer);
+      autoTimer = null;
+    }
+    if (progressBar) progressBar.classList.remove('running');
+  }
+
+  function scheduleAutoAdvance() {
+    clearAutoTimer();
+    if (hover || paused || current >= slides.length - 1) return;
+    if (progressBar) progressBar.classList.add('running');
+    autoTimer = setTimeout(() => {
+      autoTimer = null;
+      if (progressBar) progressBar.classList.remove('running');
+      if (hover || paused) return;
+      if (current < slides.length - 1) next();
+      scheduleAutoAdvance();
+    }, AUTO_ADVANCE_MS);
+  }
+
+  function restartAutoAdvance() {
+    scheduleAutoAdvance();
+  }
+
+  // Manual navigation always restarts the timer.
+  const retriggerNext = () => { next(); restartAutoAdvance(); };
+  const retriggerPrev = () => { prev(); restartAutoAdvance(); };
+
   const nextBtn = document.querySelector('.recap-next');
   const prevBtn = document.querySelector('.recap-prev');
-  if (nextBtn) nextBtn.addEventListener('click', next);
-  if (prevBtn) prevBtn.addEventListener('click', prev);
+  if (nextBtn) nextBtn.addEventListener('click', retriggerNext);
+  if (prevBtn) prevBtn.addEventListener('click', retriggerPrev);
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight') next();
-    if (e.key === 'ArrowLeft') prev();
+    if (e.key === 'ArrowRight') retriggerNext();
+    if (e.key === 'ArrowLeft') retriggerPrev();
   });
 
   slides.forEach((slide) => {
@@ -73,10 +107,26 @@
       if (e.target.closest('a, button, select')) return;
       const rect = slide.getBoundingClientRect();
       const clickX = e.clientX - rect.left;
-      if (clickX < rect.width / 2) prev();
-      else next();
+      if (clickX < rect.width / 2) retriggerPrev();
+      else retriggerNext();
+    });
+  });
+
+// Pause auto-advance only while hovering the interactive controls,
+// NOT the whole body (which fills the viewport and would permanently pause).
+  const hoverTargets = document.querySelectorAll('.recap-nav, .recap-year-picker, .recap-progress');
+  hoverTargets.forEach((el) => {
+    el.addEventListener('mouseenter', () => {
+      hover = true;
+      scheduleAutoAdvance();
+    });
+    el.addEventListener('mouseleave', () => {
+      hover = false;
+      scheduleAutoAdvance();
     });
   });
 
   showSlide(0);
+  scheduleAutoAdvance();
 })();
+

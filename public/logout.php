@@ -1,6 +1,5 @@
 <?php
-require "../includes/helpers.php";
-initSecureSession();
+require "../includes/bootstrap.php";
 
 $_SESSION = [];
 session_destroy();

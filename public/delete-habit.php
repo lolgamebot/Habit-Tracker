@@ -1,6 +1,5 @@
 <?php
-require "../config/db.php";
-require "../includes/helpers.php";
+require "../includes/bootstrap.php";
 
 requireLogin();
 
@@ -13,7 +12,8 @@ verifyCsrfToken();
 
 $userId = $_SESSION["user_id"];
 $habitId = (int) ($_POST["habit_id"] ?? 0);
-$month = $_POST["redirect_month"] ?? date('Y-m');
+$monthInput = $_POST["redirect_month"] ?? date('Y-m');
+$month = preg_match('/^\d{4}-\d{2}$/', $monthInput) ? $monthInput : date('Y-m');
 
 if ($habitId && habitBelongsToUser($pdo, $habitId, $userId)) {
     // Clean up its logs first, since there's no foreign key cascade
@@ -22,8 +22,9 @@ if ($habitId && habitBelongsToUser($pdo, $habitId, $userId)) {
 
     $stmt = $pdo->prepare("DELETE FROM habits WHERE id = ? AND user_id = ?");
     $stmt->execute([$habitId, $userId]);
+
+    redirectWithFlash("index.php?month=" . $month, "Habit deleted.");
 }
 
-$month = preg_match('/^\d{4}-\d{2}$/', $month) ? $month : date('Y-m');
 header("Location: index.php?month=" . $month);
 exit;

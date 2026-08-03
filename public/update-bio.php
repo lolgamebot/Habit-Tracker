@@ -1,6 +1,5 @@
 <?php
-require "../config/db.php";
-require "../includes/helpers.php";
+require "../includes/bootstrap.php";
 
 requireLogin();
 
@@ -14,5 +13,4 @@ verifyCsrfToken();
 $userId = $_SESSION["user_id"];
 updateBio($pdo, $userId, $_POST['bio'] ?? '');
 
-header("Location: profile.php?flash=" . urlencode("Bio updated.") . "&flash_type=success");
-exit;
+redirectWithFlash('profile.php', "Bio updated.");

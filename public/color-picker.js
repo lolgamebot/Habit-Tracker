@@ -112,10 +112,11 @@
     // palette (--cream, --surface, --ink, etc.) is governed by the .dark-mode
     // class, and overriding --cream here with an inline style would permanently
     // fight that class rule until the next full page load cleared it.
-    if (!document.documentElement.classList.contains('dark-mode')) {
+if (!document.documentElement.classList.contains('dark-mode')) {
         const creamHex = hslToHex(h, Math.min(s, 15), 97);
         document.documentElement.style.setProperty('--cream', creamHex);
     }
+  }
 
   function drawBox() {
     if (!canvas) return;

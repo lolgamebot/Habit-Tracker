@@ -1,10 +1,13 @@
 <?php
-require "../config/db.php";
-require "../includes/helpers.php";
+require "../includes/bootstrap.php";
 
 requireLogin();
 
 $userId = $_SESSION["user_id"];
+loadUserSession($pdo, $userId);
+
+$flash = $_GET['flash'] ?? null;
+$flashType = ($_GET['flash_type'] ?? 'success') === 'error' ? 'error' : 'success';
 
 $month = $_GET['month'] ?? date('Y-m');
 if (!preg_match('/^\d{4}-\d{2}$/', $month)) {
@@ -34,6 +37,10 @@ $theme = getTheme($_SESSION['theme'] ?? 'rose');
 <?php renderNav($_SESSION["username"], getPendingFriendRequestCount($pdo, $userId), $_SESSION['avatar'] ?? null); ?>
 
 <main class="page">
+    <?php if ($flash): ?>
+        <p class="alert <?= $flashType === 'error' ? 'alert-error' : 'alert-success' ?>"><?= e($flash) ?></p>
+    <?php endif; ?>
+
     <div class="dashboard-header">
         <div class="month-nav">
             <a href="index.php?month=<?= $prevMonth ?>" class="btn btn-ghost">&larr;</a>

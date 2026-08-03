@@ -1,9 +1,9 @@
 <?php
-require "../config/db.php";
-require "../includes/helpers.php";
+require "../includes/bootstrap.php";
 
 requireLogin();
 $userId = $_SESSION["user_id"];
+loadUserSession($pdo, $userId);
 
 $availableYears = getAvailableYears($pdo, $userId);
 $currentYear = (int) date('Y');

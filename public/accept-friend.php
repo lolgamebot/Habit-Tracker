@@ -1,6 +1,5 @@
 <?php
-require "../config/db.php";
-require "../includes/helpers.php";
+require "../includes/bootstrap.php";
 
 requireLogin();
 
@@ -14,8 +13,8 @@ verifyCsrfToken();
 $userId = $_SESSION["user_id"];
 $requestId = (int) ($_POST["request_id"] ?? 0);
 
-$ok = acceptFriendRequest($pdo, $requestId, $userId);
-$msg = $ok ? "Friend request accepted." : "Could not accept that request.";
+if ($requestId && acceptFriendRequest($pdo, $requestId, $userId)) {
+    redirectWithFlash('profile.php', "Friend request accepted.");
+}
 
-header("Location: profile.php?flash=" . urlencode($msg) . "&flash_type=" . ($ok ? "success" : "error"));
-exit;
+redirectWithFlash('profile.php', "Could not accept that request.", false);

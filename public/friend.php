@@ -1,9 +1,9 @@
 <?php
-require "../config/db.php";
-require "../includes/helpers.php";
+require "../includes/bootstrap.php";
 
 requireLogin();
 $userId = $_SESSION["user_id"];
+loadUserSession($pdo, $userId);
 
 $friendId = (int) ($_GET["id"] ?? 0);
 
@@ -34,11 +34,7 @@ $thisMonthChecked = array_sum(array_column($grid['rowStats'], 'checked'));
 $thisMonthPossible = $totalHabits * $grid['daysInMonth'];
 $thisMonthPercent = $thisMonthPossible > 0 ? round($thisMonthChecked / $thisMonthPossible * 100, 1) : 0.0;
 
-$stmt = $pdo->prepare("SELECT avatar, theme FROM accounts WHERE id = ?");
-$stmt->execute([$userId]);
-$me = $stmt->fetch();
-$myAvatar = $me['avatar'];
-$myTheme = $me['theme'] ?? 'rose';
+$myAvatar = $_SESSION['avatar'] ?? null;
 ?>
 <!DOCTYPE html>
 <html lang="en">

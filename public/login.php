@@ -1,8 +1,5 @@
 <?php
-require "../config/db.php";
-require "../includes/helpers.php";
-
-initSecureSession();
+require "../includes/bootstrap.php";
 
 if (isset($_SESSION["user_id"])) {
     header("Location: index.php");

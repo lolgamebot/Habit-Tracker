@@ -1,6 +1,5 @@
 <?php
-require "../config/db.php";
-require "../includes/helpers.php";
+require "../includes/bootstrap.php";
 
 requireLogin();
 
@@ -17,9 +16,5 @@ $search = (string) ($_POST["search"] ?? '');
 
 [$ok, $msg] = sendFriendRequest($pdo, $userId, $targetId);
 
-$redirect = "profile.php?flash=" . urlencode($msg) . "&flash_type=" . ($ok ? "success" : "error");
-if ($search !== '') {
-    $redirect .= "&search=" . urlencode($search);
-}
-header("Location: " . $redirect);
-exit;
+$redirect = "profile.php?search=" . urlencode($search);
+redirectWithFlash($search !== '' ? $redirect : 'profile.php', $msg, $ok);

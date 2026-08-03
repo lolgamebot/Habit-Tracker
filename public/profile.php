@@ -1,10 +1,10 @@
 <?php
-require "../config/db.php";
-require "../includes/helpers.php";
+require "../includes/bootstrap.php";
 
 requireLogin();
 $userId = $_SESSION["user_id"];
 $username = $_SESSION["username"];
+loadUserSession($pdo, $userId);
 
 $flash = $_GET['flash'] ?? null;
 $flashType = ($_GET['flash_type'] ?? 'success') === 'error' ? 'error' : 'success';

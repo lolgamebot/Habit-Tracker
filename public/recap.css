@@ -76,6 +76,16 @@
 .recap-progress-seg.done span { width: 100%; }
 .recap-progress-seg.current span { width: 100%; transition: width 0.4s ease; }
 
+/* Auto-advance fill animation on the current segment */
+.recap-progress.running .recap-progress-seg.current span {
+  width: 0;
+  animation: recap-auto 4s linear forwards;
+}
+@keyframes recap-auto {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
 .recap-nav {
   position: fixed; top: 50%; transform: translateY(-50%);
   background: rgba(255, 255, 255, 0.15); border: none; color: #fff;

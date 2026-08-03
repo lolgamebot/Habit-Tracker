@@ -1,6 +1,5 @@
 <?php
-require "../config/db.php";
-require "../includes/helpers.php";
+require "../includes/bootstrap.php";
 
 requireLogin();
 
@@ -19,5 +18,4 @@ if ($ok) {
 }
 
 $msg = $ok ? "Profile picture updated." : $result;
-header("Location: profile.php?flash=" . urlencode($msg) . "&flash_type=" . ($ok ? "success" : "error"));
-exit;
+redirectWithFlash('profile.php', $msg, $ok);

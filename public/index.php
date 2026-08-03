@@ -49,7 +49,7 @@ $theme = getTheme($_SESSION['theme'] ?? 'rose');
         </div>
 
         <form action="add-habit.php" method="post" class="add-habit-form">
-            <?php renderCsrfInput(); ?>
+            <?php echo renderCsrfInput(); ?>
             <input type="hidden" name="redirect_month" value="<?= e($month) ?>">
             <input type="text" name="name" placeholder="New habit, e.g. Read 10 pages" required maxlength="80">
             <button type="submit" class="btn btn-primary">Add habit</button>
@@ -89,7 +89,7 @@ $theme = getTheme($_SESSION['theme'] ?? 'rose');
                     <div class="habit-cell-inner">
                     <span class="habit-name"><?= e($habit['name']) ?></span>
                     <form action="delete-habit.php" method="post" class="inline-form">
-                        <?php renderCsrfInput(); ?>
+                        <?php echo renderCsrfInput(); ?>
                         <input type="hidden" name="habit_id" value="<?= $habit['id'] ?>">
                         <input type="hidden" name="redirect_month" value="<?= e($month) ?>">
                         <button type="submit" class="link-button danger" onclick="return confirm('Delete this habit and all its history?')">&times;</button>

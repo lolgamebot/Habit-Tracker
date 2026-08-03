@@ -70,7 +70,7 @@ $totalCheckins = (int) $stmt->fetchColumn();
     <input type="file" id="avatar-input" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none;">
     <?php if ($account['avatar']): ?>
         <form action="remove-avatar.php" method="post" class="inline-form">
-            <?php renderCsrfInput(); ?>
+            <?php echo renderCsrfInput(); ?>
             <button type="submit" class="link-button" style="font-size:0.82rem;">Remove photo</button>
         </form>
     <?php endif; ?>
@@ -99,7 +99,7 @@ $totalCheckins = (int) $stmt->fetchColumn();
     <section class="profile-section">
         <h2>About me</h2>
         <form action="update-bio.php" method="post" class="bio-form">
-            <?php renderCsrfInput(); ?>
+            <?php echo renderCsrfInput(); ?>
             <textarea name="bio" maxlength="280" placeholder="Say a little about yourself and what you're working on..."><?= e($account['bio'] ?? '') ?></textarea>
             <button type="submit" class="btn btn-primary btn-sm">Save bio</button>
         </form>
@@ -118,7 +118,7 @@ $totalCheckins = (int) $stmt->fetchColumn();
         <div class="theme-swatch-container">
         <?php foreach (getThemeList() as $themeId => $t): ?>
             <form action="update-theme.php" method="post" class="inline-form">
-                <?php renderCsrfInput(); ?>
+                <?php echo renderCsrfInput(); ?>
                 <input type="hidden" name="theme" value="<?= e($themeId) ?>">
                 <button
                     type="submit"
@@ -132,7 +132,7 @@ $totalCheckins = (int) $stmt->fetchColumn();
 
             <!-- Custom Swatch Circle -->
             <form action="update-theme.php" method="post" class="inline-form">
-                <?php renderCsrfInput(); ?>
+                <?php echo renderCsrfInput(); ?>
                 <input type="hidden" name="theme" value="custom">
                 <input type="hidden" name="custom_color" value="<?= e($account['custom_color'] ?? '#5865f2') ?>">
                 <button
@@ -150,7 +150,7 @@ $totalCheckins = (int) $stmt->fetchColumn();
         <div class="custom-color-controls">
             <h3 style="font-size:0.95rem; margin:0 0 0.75rem;">Custom Accent Color</h3>
             <form action="update-theme.php" method="post" id="custom-theme-form">
-                <?php renderCsrfInput(); ?>
+                <?php echo renderCsrfInput(); ?>
                 <input type="hidden" name="theme" value="custom">
 
                 <div class="custom-color-row">
@@ -212,14 +212,14 @@ $totalCheckins = (int) $stmt->fetchColumn();
                             <span class="friend-status">Request sent</span>
                         <?php elseif ($r['status'] === 'pending_received'): ?>
                             <form action="add-friend.php" method="post" class="inline-form">
-                                <?php renderCsrfInput(); ?>
+                                <?php echo renderCsrfInput(); ?>
                                 <input type="hidden" name="target_id" value="<?= $r['id'] ?>">
                                 <input type="hidden" name="search" value="<?= e($searchQuery) ?>">
                                 <button type="submit" class="btn btn-primary btn-sm">Accept request</button>
                             </form>
                         <?php else: ?>
                             <form action="add-friend.php" method="post" class="inline-form">
-                                <?php renderCsrfInput(); ?>
+                                <?php echo renderCsrfInput(); ?>
                                 <input type="hidden" name="target_id" value="<?= $r['id'] ?>">
                                 <input type="hidden" name="search" value="<?= e($searchQuery) ?>">
                                 <button type="submit" class="btn btn-primary btn-sm">Add friend</button>
@@ -241,12 +241,12 @@ $totalCheckins = (int) $stmt->fetchColumn();
                 <?= renderAvatar($req['avatar'], $req['username'], 'md') ?>
                 <span class="friend-name"><?= e($req['username']) ?></span>
                 <form action="accept-friend.php" method="post" class="inline-form">
-                    <?php renderCsrfInput(); ?>
+                    <?php echo renderCsrfInput(); ?>
                     <input type="hidden" name="request_id" value="<?= $req['friendship_id'] ?>">
                     <button type="submit" class="btn btn-primary btn-sm">Accept</button>
                 </form>
                 <form action="remove-friend.php" method="post" class="inline-form">
-                    <?php renderCsrfInput(); ?>
+                    <?php echo renderCsrfInput(); ?>
                     <input type="hidden" name="friendship_id" value="<?= $req['friendship_id'] ?>">
                     <button type="submit" class="btn btn-ghost btn-sm">Decline</button>
                 </form>
@@ -266,7 +266,7 @@ $totalCheckins = (int) $stmt->fetchColumn();
                 <span class="friend-name"><?= e($req['username']) ?></span>
                 <span class="friend-status">Pending</span>
                 <form action="remove-friend.php" method="post" class="inline-form">
-                    <?php renderCsrfInput(); ?>
+                    <?php echo renderCsrfInput(); ?>
                     <input type="hidden" name="friendship_id" value="<?= $req['friendship_id'] ?>">
                     <button type="submit" class="btn btn-ghost btn-sm">Cancel</button>
                 </form>
@@ -287,7 +287,7 @@ $totalCheckins = (int) $stmt->fetchColumn();
                     <a href="friend.php?id=<?= $f['user_id'] ?>"><?= renderAvatar($f['avatar'], $f['username'], 'md') ?></a>
                     <a href="friend.php?id=<?= $f['user_id'] ?>" class="friend-name friend-name-link"><?= e($f['username']) ?></a>
                     <form action="remove-friend.php" method="post" class="inline-form">
-                        <?php renderCsrfInput(); ?>
+                        <?php echo renderCsrfInput(); ?>
                         <input type="hidden" name="friendship_id" value="<?= $f['friendship_id'] ?>">
                         <button type="submit" class="btn btn-ghost btn-sm" onclick="return confirm('Remove this friend?')">Remove</button>
                     </form>

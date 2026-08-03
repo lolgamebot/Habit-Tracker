@@ -1,10 +1,4 @@
 <?php
-/**
- * Central bootstrap for all Habit Tracker pages.
- *
- * Loads DB config + shared helpers, sends consistent security headers,
- * and initializes a hardened session. Every page should require this file.
- */
 
 // Load database connection + all shared helper functions.
 require __DIR__ . '/../config/db.php';

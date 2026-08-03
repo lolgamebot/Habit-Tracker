@@ -31,7 +31,7 @@ function getCsrfToken() {
 }
 
 function renderCsrfInput() {
-    echo '<input type="hidden" name="csrf_token" value="' . e(getCsrfToken()) . '">';
+    return '<input type="hidden" name="csrf_token" value="' . e(getCsrfToken()) . '">';
 }
 
 function verifyCsrfToken() {
@@ -647,8 +647,8 @@ function getYearRecap($pdo, $userId, $year) {
         WHERE h.user_id = ? AND hl.completed = 1 AND hl.log_date BETWEEN ? AND ?
         GROUP BY h.id, h.name
     ");
-    $stmt->execute([$userId, $yearStart, $yearEnd]);
-$habitCounts = $stmt->fetchAll();
+$stmt->execute([$userId, $yearStart, $yearEnd]);
+    $habitCounts = $stmt->fetchAll();
 
     $bestHabitName = null;
     $bestHabitPercent = 0.0;
@@ -673,10 +673,10 @@ $habitCounts = $stmt->fetchAll();
         WHERE h.user_id = ? AND hl.completed = 1 AND hl.log_date BETWEEN ? AND ?
         GROUP BY mo
     ");
-    $stmt->execute([$userId, $yearStart, $yearEnd]);
+$stmt->execute([$userId, $yearStart, $yearEnd]);
     $monthCounts = $stmt->fetchAll();
 
-$busiestMonthName = null;
+    $busiestMonthName = null;
     $busiestMonthPercent = 0.0;
     $busiestMonthCount = 0;
     $currentMonthNum = (int) $today->format('n');
@@ -735,11 +735,11 @@ $busiestMonthName = null;
         $prevDate = $date;
     }
 
-    $completionRate = ($totalHabits > 0 && $daysElapsed > 0)
+$completionRate = ($totalHabits > 0 && $daysElapsed > 0)
         ? round($totalCheckins / ($totalHabits * $daysElapsed) * 100, 1)
         : 0.0;
 
-return [
+    return [
         'year'                => (int) $year,
         'totalCheckins'       => $totalCheckins,
         'totalHabits'         => $totalHabits,

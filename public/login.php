@@ -57,7 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php endif; ?>
 
         <form method="post" action="login.php" class="stacked-form">
-            <?php renderCsrfInput(); ?>
+            <?php echo renderCsrfInput(); ?>
             <label for="username">Username</label>
             <input type="text" id="username" name="username" required autofocus>
 

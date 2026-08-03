@@ -48,7 +48,7 @@ $weekdayLetters = ['Sun' => 'S', 'Mon' => 'M', 'Tue' => 'T', 'Wed' => 'W', 'Thu'
     </div>
 
     <div class="grid-scroll">
-    <table class="habit-grid" id="habit-grid">
+<table class="habit-grid" id="habit-grid">
         <thead>
             <tr>
                 <th class="col-habit" rowspan="2">Habit</th>
@@ -77,14 +77,17 @@ $weekdayLetters = ['Sun' => 'S', 'Mon' => 'M', 'Tue' => 'T', 'Wed' => 'W', 'Thu'
             $stats = $grid['rowStats'][$habit['id']]; ?>
             <tr data-habit-id="<?= $habit['id'] ?>">
                 <td class="col-habit">
-                    <div class="habit-cell-inner">
+<div class="habit-cell-inner">
                     <span class="habit-name"><?= e($habit['name']) ?></span>
-                    <form action="delete-habit.php" method="post" class="inline-form">
-                        <?php renderCsrfInput(); ?>
-                        <input type="hidden" name="habit_id" value="<?= $habit['id'] ?>">
-                        <input type="hidden" name="redirect_month" value="<?= e($month) ?>">
-                        <button type="submit" class="link-button danger" onclick="return confirm('Delete this habit and all its history?')">&times;</button>
-                    </form>
+                    <div class="habit-actions">
+                        <button type="button" class="link-button rename-habit" data-habit-id="<?= $habit['id'] ?>" data-habit-name="<?= e($habit['name']) ?>" title="Rename habit">&#9998;</button>
+                        <form action="delete-habit.php" method="post" class="inline-form">
+                            <?php renderCsrfInput(); ?>
+                            <input type="hidden" name="habit_id" value="<?= $habit['id'] ?>">
+                            <input type="hidden" name="redirect_month" value="<?= e($month) ?>">
+                            <button type="submit" class="link-button danger" onclick="return confirm('Delete this habit and all its history?')">&times;</button>
+                        </form>
+                    </div>
                     </div>
                 </td>
                 <?php for ($d = 1; $d <= $grid['daysInMonth']; $d++):

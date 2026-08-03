@@ -7,6 +7,39 @@
   let barChart = null;
   let lineChart = null;
 
+document.querySelectorAll('.rename-habit').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const habitId = btn.dataset.habitId;
+      const currentName = btn.dataset.habitName || '';
+      const newName = prompt('Rename this habit:', currentName);
+      if (newName === null) return; // cancelled
+      const cleaned = newName.trim();
+      if (cleaned === '' || cleaned === currentName) return;
+
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = 'rename-habit.php';
+
+      const append = (name, value) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+      };
+
+      append('csrf_token', cfg.csrfToken);
+      append('habit_id', habitId);
+      append('name', cleaned);
+
+      const month = new URLSearchParams(window.location.search).get('month');
+      if (month) append('redirect_month', month);
+
+      document.body.appendChild(form);
+      form.submit();
+    });
+  });
+
   document.querySelectorAll('.habit-checkbox').forEach((box) => {
     box.addEventListener('change', async () => {
       const habitId = box.dataset.habitId;

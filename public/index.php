@@ -19,6 +19,7 @@ $prevMonth = date('Y-m', strtotime('-1 month', $monthTs));
 $nextMonth = date('Y-m', strtotime('+1 month', $monthTs));
 
 $weekdayLetters = ['Sun' => 'S', 'Mon' => 'M', 'Tue' => 'T', 'Wed' => 'W', 'Thu' => 'T', 'Fri' => 'F', 'Sat' => 'S'];
+$theme = getTheme($_SESSION['theme'] ?? 'rose');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -27,9 +28,10 @@ $weekdayLetters = ['Sun' => 'S', 'Mon' => 'M', 'Tue' => 'T', 'Wed' => 'W', 'Thu'
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($monthName) ?> - Habit Tracker</title>
     <link rel="stylesheet" href="style.css">
+<?php renderThemeStyle(); ?>
 </head>
 <body>
-<?php renderNav($_SESSION["username"]); ?>
+<?php renderNav($_SESSION["username"], getPendingFriendRequestCount($pdo, $userId), $_SESSION['avatar'] ?? null); ?>
 
 <main class="page">
     <div class="dashboard-header">
@@ -48,7 +50,7 @@ $weekdayLetters = ['Sun' => 'S', 'Mon' => 'M', 'Tue' => 'T', 'Wed' => 'W', 'Thu'
     </div>
 
     <div class="grid-scroll">
-<table class="habit-grid" id="habit-grid">
+    <table class="habit-grid" id="habit-grid">
         <thead>
             <tr>
                 <th class="col-habit" rowspan="2">Habit</th>
@@ -141,7 +143,8 @@ $weekdayLetters = ['Sun' => 'S', 'Mon' => 'M', 'Tue' => 'T', 'Wed' => 'W', 'Thu'
         csrfToken: <?= json_encode(getCsrfToken()) ?>,
         daysInMonth: <?= json_encode($grid['daysInMonth']) ?>,
         columnStats: <?= json_encode(array_values($grid['columnStats'])) ?>,
-        totalHabits: <?= json_encode(count($grid['habits'])) ?>
+        totalHabits: <?= json_encode(count($grid['habits'])) ?>,
+        accentColor: <?= json_encode($theme['accentDark']) ?>
     };
 </script>
 <script src="chart.min.js"></script>

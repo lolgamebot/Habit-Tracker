@@ -2,12 +2,9 @@
   const cfg = window.HABIT_TRACKER;
   if (!cfg) return;
 
-  // --- Checkbox saving: set up first and independently of charts, so a ---
-  // --- charting problem can never stop your check-ins from saving.     ---
-  let barChart = null;
-  let lineChart = null;
-
-document.querySelectorAll('.rename-habit').forEach((btn) => {
+  // --- Habit renaming: submit a small form to rename-habit.php so the ---
+  // --- page reloads and shows the updated name + flash message.        ---
+  document.querySelectorAll('.rename-habit').forEach((btn) => {
     btn.addEventListener('click', () => {
       const habitId = btn.dataset.habitId;
       const currentName = btn.dataset.habitName || '';
@@ -39,6 +36,11 @@ document.querySelectorAll('.rename-habit').forEach((btn) => {
       form.submit();
     });
   });
+
+  // --- Checkbox saving: set up first and independently of charts, so a ---
+  // --- charting problem can never stop your check-ins from saving.     ---
+  let barChart = null;
+  let lineChart = null;
 
   document.querySelectorAll('.habit-checkbox').forEach((box) => {
     box.addEventListener('change', async () => {
@@ -102,7 +104,7 @@ document.querySelectorAll('.rename-habit').forEach((btn) => {
 
     barChart = new Chart(document.getElementById('chart-completed'), {
       type: 'bar',
-      data: { labels, datasets: [{ label: 'Tasks completed', data: completedData, backgroundColor: '#c9a8a6', borderRadius: 4, maxBarThickness: 22 }] },
+      data: { labels, datasets: [{ label: 'Tasks completed', data: completedData, backgroundColor: cfg.accentColor || '#c9a8a6', borderRadius: 4, maxBarThickness: 22 }] },
       options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, suggestedMax: cfg.totalHabits, ticks: { stepSize: 1 } } } },
     });
 
@@ -115,3 +117,35 @@ document.querySelectorAll('.rename-habit').forEach((btn) => {
     console.error('Charts failed to load:', err);
   }
 })();
+
+// Global Dark Mode Toggle handler
+document.addEventListener('DOMContentLoaded', function () {
+  const darkModeToggle = document.getElementById('dark-mode-checkbox');
+  const darkModeForm = document.getElementById('dark-mode-form');
+
+  if (darkModeToggle) {
+    darkModeToggle.addEventListener('change', async function () {
+      const isDark = darkModeToggle.checked;
+      if (isDark) {
+        document.documentElement.classList.add('dark-mode');
+        document.body.classList.add('dark-mode');
+      } else {
+        document.documentElement.classList.remove('dark-mode');
+        document.body.classList.remove('dark-mode');
+      }
+
+      try {
+        const formData = darkModeForm ? new FormData(darkModeForm) : new FormData();
+        formData.set('dark_mode', isDark ? '1' : '0');
+
+        await fetch('toggle-dark-mode.php', {
+          method: 'POST',
+          headers: { 'X-Requested-With': 'XMLHttpRequest' },
+          body: formData,
+        });
+      } catch (e) {
+        console.error('Failed to sync dark mode state:', e);
+      }
+    });
+  }
+});

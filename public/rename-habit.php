@@ -16,7 +16,19 @@ $habitId = (int) ($_POST["habit_id"] ?? 0);
 $name = trim($_POST["name"] ?? "");
 $month = $_POST["redirect_month"] ?? date('Y-m');
 
-if ($name !== "" && strlen($name) <= 80 && $habitId && habitBelongsToUser($pdo, $habitId, $userId)) {
+if ($name === '') {
+    $month = preg_match('/^\d{4}-\d{2}$/', $month) ? $month : date('Y-m');
+    header("Location: index.php?month=" . $month);
+    exit;
+}
+
+if (strlen($name) > 80) {
+    $month = preg_match('/^\d{4}-\d{2}$/', $month) ? $month : date('Y-m');
+    header("Location: index.php?month=" . $month);
+    exit;
+}
+
+if ($habitId && habitBelongsToUser($pdo, $habitId, $userId)) {
     $stmt = $pdo->prepare("UPDATE habits SET name = ? WHERE id = ? AND user_id = ?");
     $stmt->execute([$name, $habitId, $userId]);
 }
@@ -24,3 +36,4 @@ if ($name !== "" && strlen($name) <= 80 && $habitId && habitBelongsToUser($pdo, 
 $month = preg_match('/^\d{4}-\d{2}$/', $month) ? $month : date('Y-m');
 header("Location: index.php?month=" . $month);
 exit;
+

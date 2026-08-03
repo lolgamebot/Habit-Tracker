@@ -45,6 +45,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             session_regenerate_id(true);
             $_SESSION["user_id"] = $userId;
             $_SESSION["username"] = $username;
+            $_SESSION["avatar"] = null;
+            $_SESSION["theme"] = 'rose';
 
             header("Location: index.php");
             exit;

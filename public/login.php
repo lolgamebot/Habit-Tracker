@@ -28,6 +28,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             session_regenerate_id(true);
             $_SESSION["user_id"] = $account["id"];
             $_SESSION["username"] = $account["username"];
+            $_SESSION["avatar"] = $account["avatar"];
+            $_SESSION["theme"] = $account["theme"] ?? 'rose';
+            $_SESSION["custom_color"] = $account["custom_color"] ?? null;
+            $_SESSION["dark_mode"] = (bool)($account["dark_mode"] ?? false);
 
             header("Location: index.php");
             exit;

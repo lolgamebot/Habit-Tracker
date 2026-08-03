@@ -1,1 +1,5 @@
 config/db.php
+public/uploads/avatars/*
+!public/uploads/avatars/.gitkeep
+!public/uploads/avatars/.htaccess
+.analysis_tmp/

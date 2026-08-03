@@ -26,6 +26,7 @@ $hasData = $recap['totalCheckins'] > 0;
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?= $year ?> Recap - Habit Tracker</title>
 <link rel="stylesheet" href="recap.css">
+<?php renderThemeStyle(); ?>
 </head>
 <body class="recap-body">
 

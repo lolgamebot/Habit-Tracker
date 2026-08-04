@@ -278,6 +278,39 @@ thead .col-habit { background: var(--accent-dark) !important; color: var(--surfa
 .habit-actions .link-button:hover { opacity: 1; }
 .habit-actions .link-button.danger { font-size: 1rem; }
 
+/* ---- Inline rename form ---- */
+.rename-form { margin: 0; }
+.rename-form-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.rename-input {
+  flex: 1;
+  padding: 0.35rem 0.6rem;
+  border: 1.5px solid var(--accent);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  min-width: 0;
+  background: var(--surface);
+  color: var(--ink);
+  transition: border-color 0.15s;
+}
+.rename-input:focus { outline: none; border-color: var(--accent-dark); }
+.btn-rename-save,
+.btn-rename-cancel {
+  padding: 0.3rem 0.55rem !important;
+  margin-top: 0 !important;
+  font-size: 0.82rem;
+  min-width: 0;
+  line-height: 1;
+  height: auto;
+}
+.btn-rename-save { box-shadow: none !important; }
+
+
 table.habit-grid .col-stat { font-weight: 700; background: #f3ece6; color: var(--accent-dark); }
 table.habit-grid tfoot td { font-weight: 700; background: #f6f1ec; color: var(--muted); }
 table.habit-grid tfoot .col-habit { background: #f6f1ec; }

@@ -79,10 +79,10 @@ $theme = getTheme($_SESSION['theme'] ?? 'rose');
             $stats = $grid['rowStats'][$habit['id']]; ?>
             <tr data-habit-id="<?= $habit['id'] ?>">
                 <td class="col-habit">
-<div class="habit-cell-inner">
+<div class="habit-cell-inner habit-view-mode" id="habit-view-<?= $habit['id'] ?>">
                     <span class="habit-name"><?= e($habit['name']) ?></span>
                     <div class="habit-actions">
-                        <button type="button" class="link-button rename-habit" data-habit-id="<?= $habit['id'] ?>" data-habit-name="<?= e($habit['name']) ?>" title="Rename habit">&#9998;</button>
+                        <button type="button" class="link-button rename-habit" data-habit-id="<?= $habit['id'] ?>" title="Rename habit">&#9998;</button>
                         <form action="delete-habit.php" method="post" class="inline-form">
                             <?php renderCsrfInput(); ?>
                             <input type="hidden" name="habit_id" value="<?= $habit['id'] ?>">
@@ -90,7 +90,17 @@ $theme = getTheme($_SESSION['theme'] ?? 'rose');
                             <button type="submit" class="link-button danger" onclick="return confirm('Delete this habit and all its history?')">&times;</button>
                         </form>
                     </div>
+</div>
+<form action="rename-habit.php" method="post" class="rename-form" id="habit-rename-<?= $habit['id'] ?>" style="display:none">
+                    <?php renderCsrfInput(); ?>
+                    <input type="hidden" name="habit_id" value="<?= $habit['id'] ?>">
+                    <input type="hidden" name="redirect_month" value="<?= e($month) ?>">
+                    <div class="rename-form-inner">
+                        <input type="text" name="name" value="<?= e($habit['name']) ?>" required maxlength="80" class="rename-input" id="rename-input-<?= $habit['id'] ?>">
+                        <button type="submit" class="btn btn-primary btn-rename-save" title="Save">✓</button>
+                        <button type="button" class="btn btn-ghost btn-rename-cancel" data-habit-id="<?= $habit['id'] ?>" title="Cancel">✕</button>
                     </div>
+</form>
                 </td>
                 <?php for ($d = 1; $d <= $grid['daysInMonth']; $d++):
                     $checked = !empty($grid['logs'][$habit['id']][$d]);

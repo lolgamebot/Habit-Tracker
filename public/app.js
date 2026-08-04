@@ -2,38 +2,35 @@
   const cfg = window.HABIT_TRACKER;
   if (!cfg) return;
 
-  // --- Habit renaming: submit a small form to rename-habit.php so the ---
-  // --- page reloads and shows the updated name + flash message.        ---
+  // --- Habit renaming: toggle inline form instead of prompt() ---
   document.querySelectorAll('.rename-habit').forEach((btn) => {
     btn.addEventListener('click', () => {
       const habitId = btn.dataset.habitId;
-      const currentName = btn.dataset.habitName || '';
-      const newName = prompt('Rename this habit:', currentName);
-      if (newName === null) return; // cancelled
-      const cleaned = newName.trim();
-      if (cleaned === '' || cleaned === currentName) return;
+      const viewEl = document.getElementById('habit-view-' + habitId);
+      const formEl = document.getElementById('habit-rename-' + habitId);
+      const inputEl = document.getElementById('rename-input-' + habitId);
 
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = 'rename-habit.php';
+      if (viewEl && formEl) {
+        viewEl.style.display = 'none';
+        formEl.style.display = 'block';
+        if (inputEl) {
+          inputEl.focus();
+          inputEl.select();
+        }
+      }
+    });
+  });
 
-      const append = (name, value) => {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = name;
-        input.value = value;
-        form.appendChild(input);
-      };
+  document.querySelectorAll('.btn-rename-cancel').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const habitId = btn.dataset.habitId;
+      const viewEl = document.getElementById('habit-view-' + habitId);
+      const formEl = document.getElementById('habit-rename-' + habitId);
 
-      append('csrf_token', cfg.csrfToken);
-      append('habit_id', habitId);
-      append('name', cleaned);
-
-      const month = new URLSearchParams(window.location.search).get('month');
-      if (month) append('redirect_month', month);
-
-      document.body.appendChild(form);
-      form.submit();
+      if (viewEl && formEl) {
+        formEl.style.display = 'none';
+        viewEl.style.display = 'flex';
+      }
     });
   });
 
